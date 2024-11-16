@@ -1,7 +1,7 @@
 import pandas as pd
 from fastai.tabular.all import *
 from fastai.vision.all import *
-
+ 
 # Load the datasets
 product_data = pd.read_csv("./product_data.csv")  # Replace with actual file path
 attribute_data = pd.read_csv("./attribute_data.csv")  # Replace with actual file path
