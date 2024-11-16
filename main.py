@@ -139,8 +139,8 @@ if uploaded_file and metadata_file:
     df = pd.DataFrame(data)
 
     # Center the download button
-    
-    if st.button("Prepare Download"):
+    col_but = st.columns((1, 1, 1, 1, 1))[2] 
+    if col_but.button("Start Processing"):
     # Crear una barra de progreso
         progress = st.progress(0)
         for i in range(100):
@@ -148,8 +148,9 @@ if uploaded_file and metadata_file:
             progress.progress(i + 1)
         
         # Mostrar el botón de descarga una vez que se completa la barra de progreso
-        st.download_button(
-            label="📥 Download predictions as CSV",
+        col_but = st.columns((1, 1, 1))[1] 
+        col_but.download_button(
+            label="📥 Download Predictions as CSV",
             data=df.to_csv(index=False),
             file_name="predicted_attributes.csv",
             mime="text/csv",
