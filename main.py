@@ -2,64 +2,63 @@ import streamlit as st
 from PIL import Image
 import pandas as pd
 
-# Configuración inicial de la página
-st.set_page_config(page_title="Fashion Attribute Analysis", layout="centered", page_icon="👗")
+# Initial page configuration
+st.set_page_config(page_title="FashionLens", layout="centered", page_icon="👗")
 
-# Título y descripción
-st.title("👗 Fashion Attribute Analysis & Classification")
+# Title and description
+st.title("FashionLens")
 st.write(
     """
-    Bienvenido a la herramienta de análisis y clasificación de atributos de diseño de productos.
-    Este prototipo utiliza Machine Learning para analizar imágenes de ropa y metadatos, 
-    prediciendo atributos relevantes para agilizar el proceso de registro y diseño.
+    Welcome to FashionLens! Upload a photo of a garment, and our app will analyze it to provide key attributes such as
+    color, style, and patterns. Discover detailed insights about your outfit in seconds!
     """
 )
 
-# Sección: Subir imagen
-st.header("🔼 Subir imagen del producto")
-uploaded_file = st.file_uploader("Carga una imagen del producto para analizar:", type=["jpg", "png", "jpeg"])
+# Section: Upload image
+st.header("🔼 Upload an image of the product")
+uploaded_file = st.file_uploader("Upload an image of the product to analyze:", type=["jpg", "png", "jpeg"])
 
-# Sección: Predicción
+# Section: Prediction
 if uploaded_file:
-    # Mostrar imagen cargada
-    st.image(Image.open(uploaded_file), caption="Imagen cargada", use_column_width=True)
+    # Show the uploaded image
+    st.image(Image.open(uploaded_file), caption="Uploaded Image", use_column_width=True)
     
-    st.write("Procesando la imagen... Por favor, espera.")
+    st.write("Processing the image... Please wait.")
     
-    # Ejemplo de predicciones simuladas
+    # Example of simulated predictions
     predictions = {
-        "silhouette_type": "Recto",
+        "silhouette_type": "Straight",
         "sleeve_length_type": "INVALID",
-        "color": "Negro",
+        "color": "Black",
         "style": "Casual",
-        "pattern": "Liso",
+        "pattern": "Plain",
     }
     
-    # Resultados de predicción
-    st.subheader("🎯 Predicciones de atributos:")
-    st.write("Estas son las predicciones de atributos para la imagen cargada:")
+    # Prediction results
+    st.subheader("🎯 Predicted Attributes:")
+    st.write("Here are the predicted attributes for the uploaded image:")
     for key, value in predictions.items():
         st.write(f"**{key.replace('_', ' ').capitalize()}**: {value}")
 
-    # Guardar los resultados en formato CSV
+    # Save results as CSV
     data = [{"test_id": f"88_49726492_{key}", "des_value": value} for key, value in predictions.items()]
     df = pd.DataFrame(data)
     st.download_button(
-        label="📥 Descargar predicciones como CSV",
+        label="📥 Download predictions as CSV",
         data=df.to_csv(index=False),
-        file_name="predicciones_atributos.csv",
+        file_name="predicted_attributes.csv",
         mime="text/csv",
     )
 
-# Instrucciones adicionales
+# Additional instructions
 else:
     st.write(
         """
-        Sube una imagen para iniciar el análisis.
-        Una vez cargada, el modelo predecirá los atributos clave del producto y te permitirá descargarlos como un archivo CSV.
+        Upload an image to start the analysis.
+        Once uploaded, the model will predict the key attributes of the product and allow you to download them as a CSV file.
         """
     )
 
 # Footer
 st.markdown("---")
-st.markdown("**Desarrollado para el Mango Challenge** 💻👕")
+st.markdown("**Developed for the Mango Challenge** 💻👕")
