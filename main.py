@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 import pandas as pd
-
+import time
 # Initial page configuration
 st.set_page_config(page_title="FashionLens", layout="centered", page_icon="./LOGOicon.png")
 
@@ -113,14 +113,9 @@ if uploaded_file and metadata_file:
 
     with col1:
         # Display the uploaded image in a styled container
-        st.markdown(
-            f"""
-            <div class="image-container">
-                <img src="data:image/jpeg;base64,{st.image(Image.open(uploaded_file), use_container_width=True).data}"/>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        # Mostrar la imagen directamente con st.image en un contenedor de Streamlit
+        st.image(Image.open(uploaded_file), caption="Uploaded Image", use_container_width=True)
+
 
     with col2:
         # Display predicted attributes
@@ -144,12 +139,23 @@ if uploaded_file and metadata_file:
     df = pd.DataFrame(data)
 
     # Center the download button
-    st.download_button(
-        label="📥 Download predictions as CSV",
-        data=df.to_csv(index=False),
-        file_name="predicted_attributes.csv",
-        mime="text/csv",
-    )
+    
+    if st.button("Prepare Download"):
+    # Crear una barra de progreso
+        progress = st.progress(0)
+        for i in range(100):
+            time.sleep(0.02)  # Simular tiempo de carga
+            progress.progress(i + 1)
+        
+        # Mostrar el botón de descarga una vez que se completa la barra de progreso
+        st.download_button(
+            label="📥 Download predictions as CSV",
+            data=df.to_csv(index=False),
+            file_name="predicted_attributes.csv",
+            mime="text/csv",
+        )
+
+
 
     
 # Additional instructions
