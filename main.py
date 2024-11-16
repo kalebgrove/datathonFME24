@@ -5,13 +5,68 @@ import pandas as pd
 # Initial page configuration
 st.set_page_config(page_title="FashionLens", layout="centered", page_icon="👗")
 
+# Custom CSS for styling
+st.markdown(
+    """
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@700&family=Instrument+Sans:wght@400&display=swap');
+
+    .main-title {
+        font-family: 'Josefin Sans', sans-serif;
+        font-size: 36px;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .description {
+        font-family: 'Instrument Sans', sans-serif;
+        font-size: 18px;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #555;
+    }
+
+    .footer {
+        font-family: 'Instrument Sans', sans-serif;
+        font-size: 16px;
+        text-align: center;
+        margin-top: 30px;
+        color: #888;
+    }
+
+    .image-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-top: 20px;
+    }
+
+    .image-container img {
+        max-width: 45%;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .attributes {
+        max-width: 45%;
+        padding-left: 20px;
+        font-family: 'Instrument Sans', sans-serif;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 # Title and description
-st.title("FashionLens")
-st.write(
+st.markdown('<div class="main-title">FashionLens</div>', unsafe_allow_html=True)
+st.markdown(
     """
-    Welcome to FashionLens! Upload a photo of a garment, and our app will analyze it to provide key attributes such as
-    color, style, and patterns. Discover detailed insights about your outfit in seconds!
-    """
+    <div class="description">
+        Welcome to FashionLens! Upload a photo of a garment, and our app will analyze it to provide key attributes 
+        such as color, style, and patterns. Discover detailed insights about your outfit in seconds!
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
 
 # Section: Upload image
@@ -20,28 +75,32 @@ uploaded_file = st.file_uploader("Upload an image of the product to analyze:", t
 
 # Section: Prediction
 if uploaded_file:
-    # Show the uploaded image
-    st.image(Image.open(uploaded_file), caption="Uploaded Image", use_column_width=True)
-    
-    st.write("Processing the image... Please wait.")
-    
-    # Example of simulated predictions
+    # Layout for image and attributes side by side
+    st.markdown('<div class="image-container">', unsafe_allow_html=True)
+
+    # Display the uploaded image
+    st.image(Image.open(uploaded_file), caption="Uploaded Image", use_column_width=True, output_format="JPEG")
+
+    # Display predicted attributes
     predictions = {
-        "silhouette_type": "Straight",
-        "sleeve_length_type": "INVALID",
-        "color": "Black",
-        "style": "Casual",
-        "pattern": "Plain",
+        "Silhouette Type": "Straight",
+        "Sleeve Length Type": "INVALID",
+        "Color": "Black",
+        "Style": "Casual",
+        "Pattern": "Plain",
     }
-    
-    # Prediction results
-    st.subheader("🎯 Predicted Attributes:")
-    st.write("Here are the predicted attributes for the uploaded image:")
+
+    attributes_html = "<div class='attributes'><h3>🎯 Predicted Attributes:</h3><ul>"
     for key, value in predictions.items():
-        st.write(f"**{key.replace('_', ' ').capitalize()}**: {value}")
+        attributes_html += f"<li><b>{key}:</b> {value}</li>"
+    attributes_html += "</ul></div>"
+    st.markdown(attributes_html, unsafe_allow_html=True)
+
+    # Close the container
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # Save results as CSV
-    data = [{"test_id": f"88_49726492_{key}", "des_value": value} for key, value in predictions.items()]
+    data = [{"test_id": f"88_49726492_{key.replace(' ', '_').lower()}", "des_value": value} for key, value in predictions.items()]
     df = pd.DataFrame(data)
     st.download_button(
         label="📥 Download predictions as CSV",
@@ -60,5 +119,4 @@ else:
     )
 
 # Footer
-st.markdown("---")
-st.markdown("**Developed for the Mango Challenge** 💻👕")
+st.markdown('<div class="footer">Developed for the Mango Challenge</div>', unsafe_allow_html=True)
