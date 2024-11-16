@@ -100,52 +100,55 @@ with col2:
     metadata_file = st.file_uploader("Upload a metadata file (.csv or .xlsx):", type=["csv", "xlsx"])
 
 # Section: Prediction
-if uploaded_file:
+if uploaded_file and metadata_file:
     # Layout for image and attributes side by side
     st.markdown('<div class="image-attributes-container">', unsafe_allow_html=True)
 
+    with col1:
     # Display the uploaded image in a styled container
-    st.markdown(
-        f"""
-        <div class="image-container">
-            <img src="data:image/jpeg;base64,{st.image(Image.open(uploaded_file), use_container_width=True).data}"/>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+        st.markdown(
+            f"""
+            <div class="image-container">
+                <img src="data:image/jpeg;base64,{st.image(Image.open(uploaded_file), use_container_width=True).data}"/>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-    # Display predicted attributes
-    predictions = {
-        "Silhouette Type": "Straight",
-        "Sleeve Length Type": "INVALID",
-        "Color": "Black",
-        "Style": "Casual",
-        "Pattern": "Plain",
-    }
+    
 
-    attributes_html = "<div class='attributes'><h3>🎯 Predicted Attributes:</h3><ul>"
-    for key, value in predictions.items():
-        attributes_html += f"<li><b>{key}:</b> {value}</li>"
-    attributes_html += "</ul></div>"
-    st.markdown(attributes_html, unsafe_allow_html=True)
+    with col2:
+        # Display predicted attributes
+        predictions = {
+            "Silhouette Type": "Straight",
+            "Sleeve Length Type": "INVALID",
+            "Color": "Black",
+            "Style": "Casual",
+            "Pattern": "Plain",
+        }
+        attributes_html = "<div class='attributes'><h3>🎯 Predicted Attributes:</h3><ul>"
+        for key, value in predictions.items():
+            attributes_html += f"<li><b>{key}:</b> {value}</li>"
+        attributes_html += "</ul></div>"
+        st.markdown(attributes_html, unsafe_allow_html=True)
+        # Close the container
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    # Close the container
-    st.markdown('</div>', unsafe_allow_html=True)
+    # # Process metadata file if uploaded
+    # if metadata_file:
+    #     try:
+    #         if metadata_file.name.endswith('.csv'):
+    #             metadata_df = pd.read_csv(metadata_file)
+    #         elif metadata_file.name.endswith('.xlsx'):
+    #             metadata_df = pd.read_excel(metadata_file)
 
-    # Process metadata file if uploaded
-    if metadata_file:
-        try:
-            if metadata_file.name.endswith('.csv'):
-                metadata_df = pd.read_csv(metadata_file)
-            elif metadata_file.name.endswith('.xlsx'):
-                metadata_df = pd.read_excel(metadata_file)
-
-            st.write("### Metadata preview:")
-            st.dataframe(metadata_df)
-        except Exception as e:
-            st.error(f"Error reading metadata file: {e}")
+    #         st.write("### Metadata preview:")
+    #         st.dataframe(metadata_df)
+    #     except Exception as e:
+    #         st.error(f"Error reading metadata file: {e}")
 
     # Save results as CSV
+    st.markdown('<div class="center-button">', unsafe_allow_html=True)
     data = [{"test_id": f"88_49726492_{key.replace(' ', '_').lower()}", "des_value": value} for key, value in predictions.items()]
     df = pd.DataFrame(data)
     st.download_button(
@@ -154,13 +157,13 @@ if uploaded_file:
         file_name="predicted_attributes.csv",
         mime="text/csv",
     )
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # Additional instructions
-else:
-    st.markdown(
-        '<div class="description">Upload an image to start the analysis. Optionally, you can also upload a metadata file for additional insights. The model will predict the key attributes of the product and allow you to download them as a CSV file.</div>',
-        unsafe_allow_html=True,
-    )
+st.markdown(
+    '<div class="description">Upload an image and a metadata file to start the analysis. The model will predict the key attributes of the product and allow you to download them as a CSV file.</div>',
+    unsafe_allow_html=True,
+)
 
 # Footer
 st.markdown('<div class="footer">Developed for the Mango Challenge</div>', unsafe_allow_html=True)
