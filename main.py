@@ -3,7 +3,7 @@ from PIL import Image
 import pandas as pd
 
 # Initial page configuration
-st.set_page_config(page_title="FashionLens", layout="centered", page_icon="👗")
+st.set_page_config(page_title="FashionLens", layout="centered", page_icon="./LOGOicon.png")
 
 # Custom CSS for styling
 st.markdown(
@@ -70,6 +70,13 @@ st.markdown(
         font-size: 20px;
         margin-bottom: 10px;
     }
+
+    /* CSS for centering the download button */
+    .center-button {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -105,7 +112,7 @@ if uploaded_file and metadata_file:
     st.markdown('<div class="image-attributes-container">', unsafe_allow_html=True)
 
     with col1:
-    # Display the uploaded image in a styled container
+        # Display the uploaded image in a styled container
         st.markdown(
             f"""
             <div class="image-container">
@@ -114,8 +121,6 @@ if uploaded_file and metadata_file:
             """,
             unsafe_allow_html=True,
         )
-
-    
 
     with col2:
         # Display predicted attributes
@@ -134,31 +139,19 @@ if uploaded_file and metadata_file:
         # Close the container
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # # Process metadata file if uploaded
-    # if metadata_file:
-    #     try:
-    #         if metadata_file.name.endswith('.csv'):
-    #             metadata_df = pd.read_csv(metadata_file)
-    #         elif metadata_file.name.endswith('.xlsx'):
-    #             metadata_df = pd.read_excel(metadata_file)
-
-    #         st.write("### Metadata preview:")
-    #         st.dataframe(metadata_df)
-    #     except Exception as e:
-    #         st.error(f"Error reading metadata file: {e}")
-
     # Save results as CSV
-    st.markdown('<div class="center-button">', unsafe_allow_html=True)
     data = [{"test_id": f"88_49726492_{key.replace(' ', '_').lower()}", "des_value": value} for key, value in predictions.items()]
     df = pd.DataFrame(data)
+
+    # Center the download button
     st.download_button(
         label="📥 Download predictions as CSV",
         data=df.to_csv(index=False),
         file_name="predicted_attributes.csv",
         mime="text/csv",
     )
-    st.markdown('</div>', unsafe_allow_html=True)
 
+    
 # Additional instructions
 st.markdown(
     '<div class="description">Upload an image and a metadata file to start the analysis. The model will predict the key attributes of the product and allow you to download them as a CSV file.</div>',
