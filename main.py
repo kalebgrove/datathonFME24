@@ -20,7 +20,7 @@ st.markdown(
 
     .title {
         font-family: 'Josefin Sans', sans-serif;
-        font-size: 30px;
+        font-size: 27px;
         text-align: center;
         margin-bottom: 10px;
     }
@@ -93,7 +93,7 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
+st.write("")
 # Section: Upload image
 st.markdown('<div class="title">Upload the product details</div>', unsafe_allow_html=True)
 col1, col2 = st.columns(2)
