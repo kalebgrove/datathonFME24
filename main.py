@@ -3,7 +3,7 @@ from PIL import Image
 import pandas as pd
 import time
 # Initial page configuration
-st.set_page_config(page_title="FashionLens", layout="centered", page_icon="./LOGOicon.png")
+st.set_page_config(page_title="FashionLens", layout="centered", page_icon="./page_icon.png")
 
 # Custom CSS for styling
 st.markdown(
