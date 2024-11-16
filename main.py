@@ -10,12 +10,25 @@ st.markdown(
     """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@700&family=Instrument+Sans:wght@400&display=swap');
-
+    .{
+        font-family: 'Instrument Sans', sans-serif;
+        font-size: 18px;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #555;
+    }
     .main-title {
         font-family: 'Josefin Sans', sans-serif;
         font-size: 36px;
         text-align: center;
         margin-bottom: 10px;
+    }
+    .title{
+        font-family: 'Josefin Sans', sans-serif;
+        font-size: 30px;
+        text-align: center;
+        margin-bottom: 10px;
+    
     }
 
     .description {
@@ -62,16 +75,24 @@ st.markdown('<div class="main-title">FashionLens</div>', unsafe_allow_html=True)
 st.markdown(
     """
     <div class="description">
-        Welcome to FashionLens! Upload a photo of a garment, and our app will analyze it to provide key attributes 
-        such as color, style, and patterns. Discover detailed insights about your outfit in seconds!
+        Welcome to FashionLens! Upload a photo of a garment and, optionally, a metadata file. Our app will analyze 
+        the data to provide key attributes such as color, style, and patterns. Discover detailed insights about your outfit in seconds!
     </div>
     """,
     unsafe_allow_html=True,
 )
 
 # Section: Upload image
-st.header("🔼 Upload an image of the product")
-uploaded_file = st.file_uploader("Upload an image of the product to analyze:", type=["jpg", "png", "jpeg"])
+st.markdown('<div class="title">Upload the product details</div>', unsafe_allow_html=True)
+col1, col2 = st.columns(2)
+
+# Image uploader
+with col1:
+    uploaded_file = st.file_uploader("Upload an image of the product:", type=["jpg", "png", "jpeg"])
+
+# Metadata uploader
+with col2:
+    metadata_file = st.file_uploader("Upload a metadata file (.csv or .xlsx):", type=["csv", "xlsx"])
 
 # Section: Prediction
 if uploaded_file:
@@ -79,7 +100,9 @@ if uploaded_file:
     st.markdown('<div class="image-container">', unsafe_allow_html=True)
 
     # Display the uploaded image
-    st.image(Image.open(uploaded_file), caption="Uploaded Image", use_column_width=True, output_format="JPEG")
+    # Display the uploaded image
+    st.image(Image.open(uploaded_file), caption="Uploaded Image", use_container_width=True, output_format="JPEG")
+
 
     # Display predicted attributes
     predictions = {
@@ -99,6 +122,19 @@ if uploaded_file:
     # Close the container
     st.markdown('</div>', unsafe_allow_html=True)
 
+    # Process metadata file if uploaded
+    if metadata_file:
+        try:
+            if metadata_file.name.endswith('.csv'):
+                metadata_df = pd.read_csv(metadata_file)
+            elif metadata_file.name.endswith('.xlsx'):
+                metadata_df = pd.read_excel(metadata_file)
+
+            st.write("### Metadata preview:")
+            st.dataframe(metadata_df)
+        except Exception as e:
+            st.error(f"Error reading metadata file: {e}")
+
     # Save results as CSV
     data = [{"test_id": f"88_49726492_{key.replace(' ', '_').lower()}", "des_value": value} for key, value in predictions.items()]
     df = pd.DataFrame(data)
@@ -113,8 +149,8 @@ if uploaded_file:
 else:
     st.write(
         """
-        Upload an image to start the analysis.
-        Once uploaded, the model will predict the key attributes of the product and allow you to download them as a CSV file.
+        Upload an image to start the analysis. Optionally, you can also upload a metadata file for additional insights.
+        The model will predict the key attributes of the product and allow you to download them as a CSV file.
         """
     )
 
