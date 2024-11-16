@@ -10,25 +10,19 @@ st.markdown(
     """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@700&family=Instrument+Sans:wght@400&display=swap');
-    .{
-        font-family: 'Instrument Sans', sans-serif;
-        font-size: 18px;
-        text-align: center;
-        margin-bottom: 20px;
-        color: #555;
-    }
+
     .main-title {
         font-family: 'Josefin Sans', sans-serif;
         font-size: 36px;
         text-align: center;
         margin-bottom: 10px;
     }
-    .title{
+
+    .title {
         font-family: 'Josefin Sans', sans-serif;
         font-size: 30px;
         text-align: center;
         margin-bottom: 10px;
-    
     }
 
     .description {
@@ -49,21 +43,26 @@ st.markdown(
 
     .image-container {
         display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
+        justify-content: center;
+        align-items: center;
         margin-top: 20px;
     }
 
     .image-container img {
-        max-width: 45%;
+        max-width: 300px; /* Reduce the image size */
         border-radius: 10px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-right: 20px;
     }
 
     .attributes {
-        max-width: 45%;
-        padding-left: 20px;
         font-family: 'Instrument Sans', sans-serif;
+        font-size: 16px;
+    }
+
+    .attributes h3 {
+        font-size: 20px;
+        margin-bottom: 10px;
     }
     </style>
     """,
@@ -100,9 +99,7 @@ if uploaded_file:
     st.markdown('<div class="image-container">', unsafe_allow_html=True)
 
     # Display the uploaded image
-    # Display the uploaded image
-    st.image(Image.open(uploaded_file), caption="Uploaded Image", use_container_width=True, output_format="JPEG")
-
+    st.image(Image.open(uploaded_file), caption="Uploaded Image", use_container_width=False, output_format="JPEG")
 
     # Display predicted attributes
     predictions = {
@@ -147,11 +144,9 @@ if uploaded_file:
 
 # Additional instructions
 else:
-    st.write(
-        """
-        Upload an image to start the analysis. Optionally, you can also upload a metadata file for additional insights.
-        The model will predict the key attributes of the product and allow you to download them as a CSV file.
-        """
+    st.markdown(
+        '<div class="description">Upload an image to start the analysis. Optionally, you can also upload a metadata file for additional insights. The model will predict the key attributes of the product and allow you to download them as a CSV file.</div>',
+        unsafe_allow_html=True,
     )
 
 # Footer
