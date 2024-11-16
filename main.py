@@ -41,18 +41,24 @@ st.markdown(
         color: #888;
     }
 
-    .image-container {
+    .image-attributes-container {
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: flex-start;
+        gap: 20px;
         margin-top: 20px;
     }
 
-    .image-container img {
-        max-width: 300px; /* Reduce the image size */
+    .image-container {
+        max-width: 10px; /* Maximum width for image container */
+        overflow: hidden;
         border-radius: 10px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        margin-right: 20px;
+    }
+
+    .image-container img {
+        width: 50%;
+        height: 50px;
     }
 
     .attributes {
@@ -96,10 +102,17 @@ with col2:
 # Section: Prediction
 if uploaded_file:
     # Layout for image and attributes side by side
-    st.markdown('<div class="image-container">', unsafe_allow_html=True)
+    st.markdown('<div class="image-attributes-container">', unsafe_allow_html=True)
 
-    # Display the uploaded image
-    st.image(Image.open(uploaded_file), caption="Uploaded Image", use_container_width=False, output_format="JPEG")
+    # Display the uploaded image in a styled container
+    st.markdown(
+        f"""
+        <div class="image-container">
+            <img src="data:image/jpeg;base64,{st.image(Image.open(uploaded_file), use_container_width=True).data}"/>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     # Display predicted attributes
     predictions = {
