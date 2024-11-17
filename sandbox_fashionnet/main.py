@@ -1,78 +1,40 @@
 import pandas as pd
-from fastai.tabular.all import *
-from fastai.vision.all import *
- 
-# Load the datasets
-product_data = pd.read_csv("./product_data.csv")  # Replace with actual file path
-attribute_data = pd.read_csv("./attribute_data.csv")  # Replace with actual file path
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+
+# Load datasets
+product_data = pd.read_csv("../archive/product_data.csv")
+attribute_data = pd.read_csv("../archive/attribute_data.csv")
 
 # Merge datasets
 data = pd.merge(product_data, attribute_data, on="cod_modelo_color", how="left")
 
-# Extract image filename information
-data['image_file'] = data['image_name']  # Assuming the column with filenames is `image_name`
+# Handle missing attributes by setting them to "INVALID"
+data['des_value'] = data['des_value'].fillna("INVALID")
 
-# Handle missing attributes by setting them to INVALID
-data['des_value'].fillna("INVALID", inplace=True)
+# Remove classes with fewer than 2 instances
+class_counts = data['des_value'].value_counts()
+valid_classes = class_counts[class_counts >= 2].index
+data = data[data['des_value'].isin(valid_classes)]
 
-# Create test_id column
-data['test_id'] = data['cod_modelo_color'] + "_" + data['attribute_name']
+# Split dataset into features and target
+X = data.drop(columns=['des_value'])
+y = data['des_value']
 
-# Encode categorical variables and target
-cat_names = ['cod_modelo_color', 'attribute_name', 'category', 'sub_category']
-cont_names = []  # Add continuous variables here if any exist
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
 
-# Preprocessing steps
-procs = [Categorify, FillMissing, Normalize]
+# Frequency encode categorical columns
+for col in X_train.select_dtypes(include='object').columns:
+    freq = X_train[col].value_counts(normalize=True)
+    X_train[col] = X_train[col].map(freq)
+    X_test[col] = X_test[col].map(freq).fillna(0)
 
-# Encode target values
-des_values = data['des_value'].unique()
-des_value_mapping = {value: idx for idx, value in enumerate(des_values)}
-data['des_value_idx'] = data['des_value'].map(des_value_mapping)
+# Train a Random Forest classifier
+clf = RandomForestClassifier(random_state=42)
+clf.fit(X_train, y_train)
 
-# Split the data into train and validation sets
-train_df, valid_df = train_test_split(data, test_size=0.2, stratify=data['des_value'])
-
-# Prepare the image paths
-train_df['image_path'] = "path/to/images/" + train_df['image_file']  # Replace with actual image directory
-valid_df['image_path'] = "path/to/images/" + valid_df['image_file']
-
-# Define DataBlock for mixed tabular and image data
-def get_x(row):
-    return row['image_path'], row[cat_names + cont_names]
-
-def get_y(row):
-    return row['des_value_idx']
-
-dblock = DataBlock(
-    blocks=(ImageBlock, TabularBlock(cat_names=cat_names, cont_names=cont_names, procs=procs), CategoryBlock),
-    get_x=get_x,
-    get_y=get_y,
-    splitter=RandomSplitter(seed=42),
-    item_tfms=Resize(224),  # Resize images for CNN
-    batch_tfms=aug_transforms()
-)
-
-# Create DataLoaders
-dls = dblock.dataloaders(train_df, bs=64)
-
-# Define and train the model
-learn = cnn_learner(
-    dls, resnet34, metrics=accuracy
-)
-
-# Fine-tune the model
-learn.fine_tune(5)
-
-# Predictions for the validation set
-test_dl = dls.test_dl(valid_df)
-preds, _ = learn.get_preds(dl=test_dl)
-predicted_labels = [des_values[int(pred.argmax())] for pred in preds]
-
-# Prepare the submission file
-valid_df['predicted_des_value'] = predicted_labels
-submission = valid_df[['test_id', 'predicted_des_value']]
-submission.columns = ['test_id', 'des_value']
-
-# Save submission
-submission.to_csv("submission.csv", index=False)
+# Evaluate the model
+y_pred = clf.predict(X_test)
+print("Accuracy:", accuracy_score(y_test, y_pred))
